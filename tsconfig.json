@@ -1,0 +1,20 @@
+{
+  "files": ["./src/index.ts"],
+  "compilerOptions": {
+    "module": "UMD",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    // "outFile": "/lib/tsc.js",
+    "outDir": "./lib",
+    "sourceMap": true,
+    "declaration":true
+  },
+  // "include": [
+  //   "src/**/*"
+  // ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}

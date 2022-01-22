@@ -1,0 +1,21 @@
+{
+  "devDependencies": {
+    "@babel/plugin-transform-typescript": "^7.16.8",
+    "@babel/preset-env": "^7.16.8",
+    "@babel/preset-typescript": "^7.16.7",
+    "@rollup/plugin-babel": "^5.3.0",
+    "rollup": "^2.64.0",
+    "rollup-plugin-dts": "^4.1.0"
+  },
+  "name": "mdata",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run dev-ts && node ./test/index.js",
+    "dev-builder": "node --inspect ./builder/index.js",
+    "dev-ts": "tsc --project ./tsconfig.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
