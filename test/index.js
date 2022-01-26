@@ -50,12 +50,26 @@ class ExecTime {
 //     t.end();
 // })(10);
 
-// 测试中文名
+// // 测试中文名
+// ((times, t = new ExecTime)=>{
+//     console.log("# 中文名测试结果")
+//     for(let i = 0; i < times; i++) {
+//         const cname = mdata.chineseName();
+//         console.log(`- ${cname}`);
+//     }
+//     t.end();
+// })(10);
+
+// 测试日期
 ((times, t = new ExecTime)=>{
-    console.log("# 中文名测试结果")
+    console.log("# 日期")
     for(let i = 0; i < times; i++) {
-        const cname = mdata.chineseName();
-        console.log(`- ${cname}`);
+        const date = mdata.date();
+        console.log(`- ${date}`);
+    }
+    for(let i = 0; i < times; i++) {
+        const date = mdata.date({month:[2,2]})();
+        console.log(`- ${date}`);
     }
     t.end();
 })(10);

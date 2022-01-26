@@ -29,6 +29,16 @@ export interface ChineseNameOptions {
     surnames?: string[];
     names?: string[];
 }
+export interface DateOptions {
+    year?: [number, number] | (() => number);
+    month?: [number, number] | ((year: number) => number);
+    day?: [number, number] | ((year: number, month: number) => number);
+    hour?: [number, number] | ((year: number, month: number, day: number) => number);
+    minute?: [number, number] | ((year: number, month: number, day: number, hour: number) => number);
+    second?: [number, number] | ((year: number, month: number, day: number, hour: number, minute: number) => number);
+    millisecond?: [number, number] | ((year: number, month: number, day: number, hour: number, minute: number, second: number) => number);
+    format?: string | ((year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number) => string);
+}
 export declare const Mdata: {
     rand: {
         (): number;
@@ -57,6 +67,10 @@ export declare const Mdata: {
     chineseName: {
         (): string;
         (op: ChineseNameOptions): (options?: ChineseNameOptions) => string;
+    };
+    date: {
+        (): string;
+        (op: DateOptions): (options?: DateOptions) => string;
     };
 };
 export {};

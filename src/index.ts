@@ -1,4 +1,5 @@
 import {HUNDRED_FAMILY_NAMES} from './baseData';
+import {getDays, num2str} from './helper';
 
 function createWrapper<T>(fn: T) {
     type In = typeof fn extends (op: infer T) => any ? T : undefined;
@@ -78,6 +79,17 @@ export interface WordOptions {
 export interface ChineseNameOptions {
     surnames?: string[]
     names?: string[]
+}
+
+export interface DateOptions {
+    year?: [number, number] | (() => number),
+    month?: [number, number] | ((year: number) => number),
+    day?: [number, number] | ((year: number, month: number) => number),
+    hour?: [number, number] | ((year: number, month: number, day: number) => number),
+    minute?: [number, number] | ((year: number, month: number, day: number, hour: number) => number),
+    second?: [number, number] | ((year: number, month: number, day: number, hour: number, minute: number) => number),
+    millisecond?: [number, number] | ((year: number, month: number, day: number, hour: number, minute: number, second: number) => number),
+    format?: string | ((year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number)=>string)
 }
 
 export const Mdata = {
@@ -202,7 +214,93 @@ export const Mdata = {
         for(let i = -0.1; i < srand(); i+=0.35) {
             ret +=  Mdata.word({lang: 'ch'})();
         }
-
         return ret;
+    }),
+    // 获取一个日期
+    date: createWrapper((options:DateOptions = {}) => {
+        let year, month, day, hour, min, sec, ms;
+        const opYear = options.year || [1900, 2100];
+        year = opYear instanceof Array ? Mdata.rand({min: opYear[0], max: opYear[1] + 1, step: 1})() : opYear();
+
+        const opMonth = options.month || [1, 12];
+        month = opMonth instanceof Array ? Mdata.rand({min: opMonth[0], max: opMonth[1] + 1, step: 1})() : opMonth(year);
+
+        const opDay = options.day || [1, getDays(year, month)];
+        day = opDay instanceof Array ? Mdata.rand({min: opDay[0], max: opDay[1] + 1, step: 1})() : opDay(year, month);
+
+        const opHour = options.hour || [1, 24];
+        hour = opHour instanceof Array ? Mdata.rand({min: opHour[0], max: opHour[1] + 1, step: 1})() : opHour(year, month, day);
+
+        const opMinute = options.minute || [1, 60];
+        min = opMinute instanceof Array ? Mdata.rand({min: opMinute[0], max: opMinute[1] + 1, step: 1})() : opMinute(year, month, day, hour);
+
+        const opSecond = options.second || [1, 60];
+        sec = opSecond instanceof Array ? Mdata.rand({min: opSecond[0], max: opSecond[1] + 1, step: 1})() : opSecond(year, month, day, hour, min);
+
+        const opMillisecond = options.millisecond || [1, 1000];
+        ms = opMillisecond instanceof Array ? Mdata.rand({min: opMillisecond[0], max: opMillisecond[1] + 1, step: 1})() : opMillisecond(year, month, day, hour, min, sec);
+
+        const format = options.format || 'YYYY-MM-DD hh:mm:ss';
+        if(typeof format === 'function') return format(year, month, day, hour, min, sec, ms);
+
+        if(typeof format !== 'string') throw Error('format期望是一个函数或者一个字符串');
+
+        let i = -1; // 当前匹配位置
+        let s = ''; // 状态
+        let l = 0; // 同状态长度
+        let r = ''; // 内容
+        const dmap = {
+            Y: year,
+            M: month,
+            D: day,
+            h: hour,
+            m: min,
+            s: sec
+        } as any;
+        while(++i < format.length) {
+            if(/[yY]/.test(format[i]) && (!s || s === 'Y')) {
+                s = 'Y';
+                l++;
+                continue;
+            }
+            if(/[M]/.test(format[i]) && (!s || s === 'M')) {
+                s = 'M';
+                l++;
+                continue;
+            }
+            if(/[Dd]/.test(format[i]) && (!s || s === 'D')) {
+                s = 'D';
+                l++;
+                continue;
+            }
+            if(/[Hh]/.test(format[i]) && (!s || s === 'h')) {
+                s = 'h';
+                l++;
+                continue;
+            }
+            if(/[m]/.test(format[i]) && (!s || s === 'm')) {
+                s = 'm';
+                l++;
+                continue;
+            }
+            if(/[Ss]/.test(format[i]) && (!s || s === 's')) {
+                s = 's';
+                l++;
+                continue;
+            }
+            if(/[\\]/.test(format[i])) {
+                r+=`${dmap[s] ? num2str(dmap[s], l) : ''}`;
+                l=0;
+                s='';
+                s = 'changed';
+                continue;
+            }
+
+            r+=`${dmap[s] ? num2str(dmap[s], l) : ''}${format[i]}`;
+            l=0;
+            s='';
+        }
+        r+=`${dmap[s] ? num2str(dmap[s], l) : ''}`;
+        return r;
     })
 }
